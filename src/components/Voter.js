@@ -25,6 +25,18 @@ let initialOptions = [
     text: "Enganging",
     value: 0
   },
+  {
+    text: "OK",
+    value: 0
+  },
+  {
+    text: "Awesome",
+    value: 0
+  },
+  {
+    text: "Pointless",
+    value: 0
+  },
 ];
 
 export default class Voter extends Component {
@@ -84,7 +96,7 @@ function Cloud(props) {
   return (
     <WordCloud
     data={props.data}
-    fontSizeMapper={word => 15 + (word.value * 10)}
+    fontSizeMapper={word => 10 + (Math.pow(word.value,2) * 4)}
     rotate={() => (Math.floor(Math.random()*(181)+90) + 180) % 360}
     font="helvetica"
     font-weight={word => 200 + (word.value * 100) }
