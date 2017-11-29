@@ -1,0 +1,37 @@
+{
+  "title": "Initial Vote",
+  "options": [
+    {
+      "text": "Boring",
+      "value": 0
+    },
+    {
+      "text": "Fun",
+      "value": 0
+    },
+    {
+      "text": "Rubbish",
+      "value": 0
+    },
+    {
+      "text": "Great",
+      "value": 0
+    },
+    {
+      "text": "Enganging",
+      "value": 0
+    },
+    {
+      "text": "OK",
+      "value": 0
+    },
+    {
+      "text": "Awesome",
+      "value": 0
+    },
+    {
+      "text": "Pointless",
+      "value": 0
+    }
+  ]
+}
