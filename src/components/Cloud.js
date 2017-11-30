@@ -13,6 +13,10 @@ export default class Cloud extends Component {
     }
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return nextState !== this.state;
+  }
+
   componentDidMount() {
     axios.get(`/latest`)
     .then(res => {
