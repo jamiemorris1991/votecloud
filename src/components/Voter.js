@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { Button } from 'reactstrap';
 import axios from 'axios';
 import '../styles/voter.css';
-import { resolve } from 'path';
-
 export default class Voter extends Component {
   constructor(props) {
     super(props);
@@ -18,9 +16,9 @@ export default class Voter extends Component {
 
   componentDidMount() {
     axios.get(`/latest`)
-    .then(res => {
-      this.setState({vote: res.data});
-    })
+      .then(res => {
+        this.setState({ vote: res.data });
+      })
   }
 
   selectOption(choice) {
@@ -29,10 +27,10 @@ export default class Voter extends Component {
       id: this.state.vote._id,
       option: choice.text
     }
-    axios.put(`/vote/option`, request)
-    .then(res => {
-      console.log(res.status);
-    })
+    axios.put(`/vote/choose`, request)
+      .then(res => {
+        console.log(res.status);
+      })
 
     //TODO Remove this block
     let newOptions = this.state.vote.options;
@@ -44,10 +42,23 @@ export default class Voter extends Component {
       }
     });
   }
-  
+
+  reset() {
+    if (window.confirm("Are you sure? This will reset all votes to zero!") === true) {
+      const request = {
+        id: this.state.vote._id,
+      };
+      axios.put(`/vote/reset`, request)
+        .then(res => {
+          this.setState({vote: res.data})
+        });
+    }
+    else return;
+  }
+
   renderOption(option) {
     return (
-      <div 
+      <div
         className="option"
         key={option.text}>
         <Option
@@ -60,10 +71,12 @@ export default class Voter extends Component {
 
   render() {
     return (
-      <div classtext="container-fluid">
-        {this.state.vote.options.map(option => {
-          return this.renderOption(option);
-        })}
+      <div>
+        <div className="container-fluid">
+          {this.state.vote.options.map(option => {
+            return this.renderOption(option);
+          })}
+        </div>
       </div>
     );
   }
@@ -72,13 +85,9 @@ export default class Voter extends Component {
 function Option(props) {
   return (
     <Button
-      classtext="option"
       style={props.size}
       onClick={props.onClick}>
-      {props.text} {props.value}
+      {props.text}
     </Button>
   )
 }
-
-// word.value*10 % 360 +
-// rotate={word =>  ( Math.floor(Math.random()*(181)+90) + 180) % 360}

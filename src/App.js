@@ -7,7 +7,7 @@ import './App.css';
 
 import Voter from './components/Voter';
 import Cloud from './components/Cloud';
-import Form from './components/VoteForm';
+import Admin from './components/Admin';
 
 class App extends Component {
   constructor(props) {
@@ -39,13 +39,14 @@ class App extends Component {
               <Nav navbar>
                 <NavItem><Link to="/">Cloud </Link></NavItem>
                 <NavItem><Link to="/vote">Vote Now!</Link></NavItem>
+                <NavItem><Link to="/Admin">Admin</Link></NavItem>
               </Nav>
              </Collapse>
            </Navbar>
             <hr />
             <Route exact path="/" component={Cloud} />
             <Route path="/vote" component={Voter} />
-            <Route path="/form" component={Form} />
+            <Route path="/admin" component={Admin} />
           </div>
       </div>
     );

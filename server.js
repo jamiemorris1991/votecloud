@@ -52,7 +52,7 @@ app.get('/latest', function(req, res) {
   });
 });
 
-app.post('/votes', function(req, res) {
+app.post('/votes/newVote', function(req, res) {
   var vote = new Vote({
     id: mongoose.Types.ObjectId(),
     title: req.body.title,
@@ -66,8 +66,7 @@ app.post('/votes', function(req, res) {
   });
 });
 
-app.put('/vote/option', function(req, res) {
-  console.log(req.body);
+app.put('/vote/choose', function(req, res) {
   Vote.findOneAndUpdate(
     {"_id" : req.body.id, "options.text": req.body.option},
     {$inc: {"options.$.value":1}},
@@ -79,6 +78,19 @@ app.put('/vote/option', function(req, res) {
     }
   );
 })
+
+app.put("/vote/reset", function(req, res) {
+  Vote.findById(req.body.id, function(err, vote) {
+    if(err)
+      res.send(err);
+    vote.options.forEach(option => option.value = 0);
+    vote.save(err => {
+      if(err) 
+        console.log("ERR");
+      res.status(200).send(vote);
+    });
+  });
+});
 
 app.listen(process.env.PORT || 8080, function() {
   console.log(`api running on port ${process.env.PORT || 8080}`);
