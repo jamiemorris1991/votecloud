@@ -1,13 +1,22 @@
 import React, { Component } from 'react';
-import { Button, Form, FormGroup, Label, Input, FormText, ListGroup, ListGroupItem, Badge, Col} from 'reactstrap';
+import { Button, Form, FormGroup, Label, Input, FormText, ListGroup, ListGroupItem, Badge, Col, Row} from 'reactstrap';
 import axios from 'axios';
 
 export default class Admin extends Component {
   constructor(props) {
     super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.addOption = this.addOption.bind(this);
     this.state = {
       currentVote: {},
-      newVote: {}
+      newVote: {
+        title: "",
+        options: []
+      },
+      newOption: {
+        text: "",
+        value: 0
+      }
     };
   }
 
@@ -18,47 +27,52 @@ export default class Admin extends Component {
       })
   }
 
-  handleSubmit(event) {
-    alert('VoteAdded ' + this.state.value);
-    event.preventDefault();
+
+
+  handleChange(event) {
+    this.setState({newOption: {
+      text: event.target.value,
+      value: 0
+    }});
   }
 
-  addVote(){
-
+  addOption(event) {
+    event.preventDefault();
+    this.setState({newVote: {
+      options : [...this.state.newVote.options, this.state.newOption]
+    }});
   }
 
   renderForm() {
     return (
-      <Form inline>
-        <Label for="exampleEmail">Add Vote</Label>
-        <Input id="exampleEmail" placeholder="with a placeholder" />
-        <Button onClick={() => this.addVote()}>Add</Button>
+      <Form onSubmit={this.addOption}>
+        <Label for="exampleEmail">Add Option</Label>
+        <Input id="exampleEmail" type="text" placeholder="Vote" onChange={this.handleChange}/>
       </Form>
     );
   }
 
   render() {
     return (
-      <div>
+      <Row>
         <Col md="6">
-          <h2>Current Vote</h2>
-          <ResetButton
-            onClick={() => this.reset()}/>
-          <OptionList
-            options={this.state.currentVote.options}/>
-        </Col>
-        {/* <Col md="6">
-          <h2>New Vote</h2>
-          <ResetButton
-            onClick={() => this.reset()}/>
-          <OptionList
-            options={this.state.newVote.options}/>
-            {this.renderForm()}
-        </Col> */}
-      </div>
+            <h2>Current Vote</h2>
+            <OptionList
+              options={this.state.currentVote.options}/>
+            <ResetButton
+              onClick={() => this.reset()}/>
+          </Col>
+          <Col md="6">
+            <h2>New Vote</h2>
+            <OptionList
+              options={this.state.newVote.options}/>
+              {this.renderForm()}
+              <SumbitButton
+              onClick={() => this.reset()}/>
+          </Col>
+        </Row>
     );
   }
-
 }
 
 function OptionList(props) {
@@ -87,7 +101,18 @@ function ResetButton(props) {
     <Button 
       color="danger"
       onClick={props.onClick}>
-      Reset
+      Reset Scores
+    </Button>
+    );
+}
+
+function SumbitButton(props) {
+  return(
+    <Button 
+      color="primary"
+      disabled
+      onClick={props.onClick}>
+      Add Vote
     </Button>
     );
 }
