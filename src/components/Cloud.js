@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import WordCloud from 'react-d3-cloud';
+import WordCloud from './WordCloud';
 import axios from 'axios';
 
 export default class Cloud extends Component {
