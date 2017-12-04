@@ -29,7 +29,9 @@ export default class Voter extends Component {
     }
     axios.put(`/vote/choose`, request)
       .then(res => {
-        console.log(res.status);
+        this.setState({
+          blocked: true
+        });
       })
   }
 
