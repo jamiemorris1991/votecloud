@@ -6,6 +6,7 @@ export default class Voter extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      blocked : false,
       vote: {
         _id: "",
         title: "",
@@ -22,7 +23,6 @@ export default class Voter extends Component {
   }
 
   selectOption(choice) {
-    console.log(this.state.vote)
     const request = {
       id: this.state.vote._id,
       option: choice.text
@@ -37,23 +37,11 @@ export default class Voter extends Component {
     const index = this.state.vote.options.findIndex(option => choice.text === option.text);
     newOptions[index].value++;
     this.setState({
+      blocked: true,
       vote: {
         options: newOptions
       }
     });
-  }
-
-  reset() {
-    if (window.confirm("Are you sure? This will reset all votes to zero!") === true) {
-      const request = {
-        id: this.state.vote._id,
-      };
-      axios.put(`/vote/reset`, request)
-        .then(res => {
-          this.setState({vote: res.data})
-        });
-    }
-    else return;
   }
 
   renderOption(option) {
@@ -72,11 +60,16 @@ export default class Voter extends Component {
   render() {
     return (
       <div>
-        <div className="container-fluid">
-          {this.state.vote.options.map(option => {
-            return this.renderOption(option);
-          })}
-        </div>
+        {this.state.blocked &&
+          <h2>Thanks for voting!</h2>  
+        }
+        {!this.state.blocked &&
+          <div className="container-fluid">
+            {this.state.vote.options.map(option => {
+              return this.renderOption(option);
+            })}
+            </div>
+        }
       </div>
     );
   }
