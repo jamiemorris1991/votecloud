@@ -17,11 +17,8 @@ class WordCloud extends Component {
       PropTypes.number,
       PropTypes.func,
     ]),
-    font: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func,
-    ]),
     fontSizeMapper: PropTypes.func,
+    fontWeightMapper: PropTypes.func,
     rotate: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.func,
@@ -32,8 +29,8 @@ class WordCloud extends Component {
     width: 700,
     height: 600,
     padding: 5,
-    font: 'serif',
     fontSizeMapper: word => word.value,
+    fontWeightMapper: word => 300,
     rotate: 0,
   }
 
@@ -42,7 +39,7 @@ class WordCloud extends Component {
   }
 
   render() {
-    const { data, width, height, padding, font, fontSizeMapper, rotate } = this.props;
+    const { data, width, height, padding, fontSizeMapper, fontWeightMapper, rotate } = this.props;
     const wordCounts = data.map(
       text => ({ ...text })
     );
@@ -53,11 +50,11 @@ class WordCloud extends Component {
     // render based on new data
     const layout = cloud()
       .size([width, height])
-      .font(font)
       .words(wordCounts)
       .padding(padding)
       .rotate(rotate)
       .fontSize(fontSizeMapper)
+      .fontWeight(fontWeightMapper)
       .on('end', words => {
         select(this.wordCloud)
           .append('svg')
@@ -70,7 +67,7 @@ class WordCloud extends Component {
           .enter()
           .append('text')
           .style('font-size', d => `${d.size}px`)
-          .style('font-family', font)
+          .style('font-weight', d => d.weight)
           .attr('class', 'word')
           .attr('text-anchor', 'middle')
           .attr('transform',
