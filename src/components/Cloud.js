@@ -33,7 +33,7 @@ export default class Cloud extends Component {
           data={this.state.latestVote.options}
           fontSizeMapper={word => 20 + (Math.pow(word.value, 2) * 4)}
           rotate={() => (Math.floor(Math.random() * (181) + 90) + 180) % 360}
-          font="helvetica"
+          font="Oswald"
           font-weight={word => 900 + (word.value * 100)}
         />
       </div>

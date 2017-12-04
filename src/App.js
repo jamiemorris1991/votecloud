@@ -30,8 +30,9 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} alt="logo" />
           <h1 className="App-title">Vote Cloud</h1>
+          <img src={logo} alt="logo" />
+          
         </header>
         <Desktop>
           <Container>

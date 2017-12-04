@@ -4,10 +4,17 @@
 
 .App-header {
   background-color: #222;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   height: 80px;
   padding: 20px;
   color: white;
   margin-bottom: 10px
+}
+
+.App-header > img {
+  width: 350px;
 }
 
 .App-title {
