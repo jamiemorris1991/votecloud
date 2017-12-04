@@ -18,7 +18,7 @@ export default class Cloud extends Component {
   }
 
   componentDidMount() {
-    axios.get(`/latest`)
+    axios.get(`/votes/current`)
     .then(res => {
       this.setState({latestVote: res.data});
     })
@@ -27,7 +27,7 @@ export default class Cloud extends Component {
   render() {
     return (
       <div className="cloud">
-        <h2>{this.state.latestVote.title}</h2>
+        {/* <h2>{this.state.latestVote.title}</h2> */}
         <WordCloud
           data={this.state.latestVote.options}
           fontSizeMapper={word => 10 + (Math.pow(word.value, 2) * 4)}
