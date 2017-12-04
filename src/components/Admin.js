@@ -196,10 +196,7 @@ function OptionList(props) {
   const listItems = options.map((option) =>
     <ListGroupItem key={option.text}>
       <span className="float-left">{option.text}</span>
-      &nbsp;
-      {props.canBeDeleted &&
-        <Badge className="float-right" onClick={() => props.onClick(option)}>X</Badge>
-      }
+      <Badge className="float-right" onClick={() => props.onClick(option)}>X</Badge>
     </ListGroupItem>
   );
   return (
