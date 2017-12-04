@@ -32,7 +32,7 @@ class App extends Component {
         <header className="App-header">
           <h1 className="App-title">Vote Cloud</h1>
           <img src={logo} alt="logo" />
-          
+
         </header>
         <Desktop>
           <Container>

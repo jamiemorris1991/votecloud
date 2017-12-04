@@ -2,10 +2,8 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactFauxDom from 'react-faux-dom';
 import { select } from 'd3-selection';
-import { scaleOrdinal } from 'd3-scale';
 import cloud from 'd3-cloud';
-
-const fill = scaleOrdinal(["#3bb2bb"]);
+import '../styles/wordCloud.css';
 
 class WordCloud extends Component {
   static propTypes = {
@@ -73,7 +71,7 @@ class WordCloud extends Component {
           .append('text')
           .style('font-size', d => `${d.size}px`)
           .style('font-family', font)
-          .style('fill', (d, i) => fill(i))
+          .attr('class', 'word')
           .attr('text-anchor', 'middle')
           .attr('transform',
             d => `translate(${[d.x, d.y]})rotate(${d.rotate})`

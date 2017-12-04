@@ -52,7 +52,7 @@ export default class Voter extends Component {
     return (
       <div>
         {this.state.blocked &&
-          <h2>Thanks for voting!</h2>  
+          <h2>Thanks for voting!</h2>
         }
         {!this.state.blocked &&
           <div className="container-fluid">
@@ -70,7 +70,7 @@ function Option(props) {
   return (
     <Button
       className="btn-block"
-      color="info"
+      color="primary"
       style={props.size}
       onClick={props.onClick}>
       {props.text}
