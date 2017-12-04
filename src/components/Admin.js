@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Form, Label, Input, ListGroup, ListGroupItem, Badge, Col, Row, Table, Container} from 'reactstrap';
+import { Button, Form, Input, ListGroup, ListGroupItem, Badge, Col, Row, Table, Container} from 'reactstrap';
 import axios from 'axios';
-import { request } from 'https';
-import { error } from 'util';
 export default class Admin extends Component {
   constructor(props) {
     super(props);
@@ -31,7 +29,6 @@ export default class Admin extends Component {
       });
     axios.get(`/votes/previous`)
       .then(res => {
-        console.log(res.data);
         this.setState({ previousVotes: res.data });
       });
   }
@@ -88,8 +85,7 @@ export default class Admin extends Component {
     console.log(this.state.newVote);
     if (window.confirm("This will start a new vote and end the previous") === true) {
       const endVoteRequest = {id: this.state.currentVote._id};
-      const newVoteRequest = {vote: this.state.newVote};
-      
+
       axios.put(`/vote/end`, endVoteRequest)
         .then(res => {
           this.setState({previousVotes: [...this.state.previousVotes, res.data]})
@@ -158,18 +154,18 @@ function VoteTable(props) {
   const votes = props.votes || [];
   const rows = votes.length > 0 ? votes.map((vote, i) =>
     <tr key={i}>
-      <td>
-        {props.onClick && 
-          <Badge color="danger" onClick={() => props.onClick(vote)}>X</Badge>
-        }
-        </td>
+      <th scope="row">
+          {props.onClick && 
+            <Badge onClick={() => props.onClick(vote)}>X</Badge>
+          }
+        </th>
         <TableRow options={vote.options}></TableRow>
     </tr>
   )
   : <div>No Live vote!</div>
 
   return (
-    <Table hover>
+    <Table responsive striped>
       {votes.length > 0 &&
         <tbody>
           {rows}
@@ -184,7 +180,7 @@ function TableRow(props) {
   return (
     options.map((option) =>
       <td key={option.text}>
-        {option.text} | {option.value }
+        {option.text} - {option.value }
       </td>
     )
   );
