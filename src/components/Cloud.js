@@ -27,13 +27,14 @@ export default class Cloud extends Component {
   render() {
     return (
       <div className="cloud">
-        {/* <h2>{this.state.latestVote.title}</h2> */}
         <WordCloud
+          width="1000"
+          height="800"
           data={this.state.latestVote.options}
-          fontSizeMapper={word => 10 + (Math.pow(word.value, 2) * 4)}
+          fontSizeMapper={word => 20 + (Math.pow(word.value, 2) * 4)}
           rotate={() => (Math.floor(Math.random() * (181) + 90) + 180) % 360}
           font="helvetica"
-          font-weight={word => 200 + (word.value * 100)}
+          font-weight={word => 900 + (word.value * 100)}
         />
       </div>
     )

@@ -67,6 +67,8 @@ export default class Voter extends Component {
 function Option(props) {
   return (
     <Button
+      className="btn-block"
+      color="info"
       style={props.size}
       onClick={props.onClick}>
       {props.text}

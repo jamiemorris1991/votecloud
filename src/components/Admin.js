@@ -120,15 +120,15 @@ export default class Admin extends Component {
     return (
       <Container>
         <Row>
-            <Col sm="6">
-              <h3 className="float-left">New Vote</h3>
-              <SumbitButton
-                  className="float-right"
-                  disabled={this.state.newVote.options.length < 2}
-                  onClick={() => this.startNewVote()}/>
+            <Col md="6">
+              <div className="flex-row d-flex clearfix justify-content-between">
+                <h3>New Vote</h3>
+                <SumbitButton
+                    disabled={this.state.newVote.options.length < 2}
+                    onClick={() => this.startNewVote()}/>
+              </div>
               <OptionList
-                className="clearfix"
-                canBeDeleted
+                className="flex-row"
                 options={this.state.newVote.options}
                 onClick={this.deleteOption}/>
                 {this.renderForm()}
@@ -195,11 +195,8 @@ function OptionList(props) {
   const options = props.options || [];
   const listItems = options.map((option) =>
     <ListGroupItem key={option.text}>
-      <div className="float-left">{option.text}</div>
-      &nbsp;
-      {props.canBeDeleted &&
-        <Button className="float-right" onClick={() => props.onClick(option)}>X</Button>
-      }
+      <span className="float-left">{option.text}</span>
+      <Badge className="float-right" onClick={() => props.onClick(option)}>X</Badge>
     </ListGroupItem>
   );
   return (

@@ -43,7 +43,6 @@ class App extends Component {
               </Nav>
              </Collapse>
            </Navbar> */}
-            <hr />
             <Route exact path="/" component={Voter} />
             <Route path="/cloud" component={Cloud} />
             <Route path="/vote" component={Voter} />
