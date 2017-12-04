@@ -1,33 +1,40 @@
 import React, { Component } from 'react';
-import { Button, Form, FormGroup, Label, Input, FormText, ListGroup, ListGroupItem, Badge, Col, Row} from 'reactstrap';
+import { Button, Form, Label, Input, ListGroup, ListGroupItem, Badge, Col, Row, Table, Container} from 'reactstrap';
 import axios from 'axios';
-
+import { request } from 'https';
+import { error } from 'util';
 export default class Admin extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
     this.addOption = this.addOption.bind(this);
+    this.deleteOption = this.deleteOption.bind(this);
+    this.removeVote = this.removeVote.bind(this);
     this.state = {
       currentVote: {},
       newVote: {
-        title: "",
-        options: []
+        options: [],
+        votingLive: false
       },
       newOption: {
         text: "",
         value: 0
-      }
+      },
+      previousVotes: []
     };
   }
 
   componentDidMount() {
-    axios.get(`/latest`)
+    axios.get(`/votes/current`)
       .then(res => {
         this.setState({ currentVote: res.data });
-      })
+      });
+    axios.get(`/votes/previous`)
+      .then(res => {
+        console.log(res.data);
+        this.setState({ previousVotes: res.data });
+      });
   }
-
-
 
   handleChange(event) {
     this.setState({newOption: {
@@ -38,60 +45,166 @@ export default class Admin extends Component {
 
   addOption(event) {
     event.preventDefault();
-    this.setState({newVote: {
-      options : [...this.state.newVote.options, this.state.newOption]
-    }});
+    this.setState({
+      newVote: {
+        options : [...this.state.newVote.options, this.state.newOption]
+      },
+      newOption: {text:"",value: 0}
+    });
+  }
+
+  deleteOption(option) {
+    let array = this.state.newVote.options;
+    const index = array.indexOf(option);
+    array.splice(index, 1);
+    this.setState({newVote: {options: array} });
+  }
+
+  reset() {
+      if (window.confirm("Are you sure? This will reset all scores for this vote to zero!") === true) {
+        const request = {
+          id: this.state.currentVote._id
+        };
+        axios.put(`/vote/reset`, request)
+          .then(res => {
+            this.setState({currentVote: res.data})
+          });
+      }
+      else return;
+  }
+
+  removeVote(vote) {
+    let votes = this.state.previousVotes;
+    const index = votes.indexOf(vote);
+    votes.splice(index, 1);
+    axios.delete(`/votes/` + vote._id)
+    .catch(error => console.log(error))
+    .then(res =>
+      this.setState({previousVotes: votes})
+    );
+  }
+
+  startNewVote(){
+    console.log(this.state.newVote);
+    if (window.confirm("This will start a new vote and end the previous") === true) {
+      const endVoteRequest = {id: this.state.currentVote._id};
+      const newVoteRequest = {vote: this.state.newVote};
+      
+      axios.put(`/vote/end`, endVoteRequest)
+        .then(res => {
+          this.setState({previousVotes: [...this.state.previousVotes, res.data]})
+          return axios.post(`/vote/new`, this.state.newVote);
+        })
+        .then(res => {
+          this.setState({
+            newVote: {
+              options: [],
+              votingLive: false
+            },
+            currentVote: res.data,
+          })
+        })
+    }
+    else return;
   }
 
   renderForm() {
     return (
       <Form onSubmit={this.addOption}>
-        <Label for="exampleEmail">Add Option</Label>
-        <Input id="exampleEmail" type="text" placeholder="Vote" onChange={this.handleChange}/>
+        <Input id="addOption" type="text" placeholder="Add Option"  value={this.state.newOption.text} onChange={this.handleChange}/>
       </Form>
     );
   }
 
   render() {
     return (
-      <Row>
-        <Col md="6">
-            <h2>Current Vote</h2>
-            <OptionList
-              options={this.state.currentVote.options}/>
-            <ResetButton
-              onClick={() => this.reset()}/>
-          </Col>
-          <Col md="6">
-            <h2>New Vote</h2>
-            <OptionList
-              options={this.state.newVote.options}/>
-              {this.renderForm()}
+      <Container>
+        <Row>
+            <Col sm="6">
+              <h3 className="float-left">New Vote</h3>
               <SumbitButton
-              onClick={() => this.reset()}/>
-          </Col>
-        </Row>
+                  className="float-right"
+                  disabled={this.state.newVote.options.length < 2}
+                  onClick={() => this.startNewVote()}/>
+              <OptionList
+                className="clearfix"
+                canBeDeleted
+                options={this.state.newVote.options}
+                onClick={this.deleteOption}/>
+                {this.renderForm()}
+            </Col>
+          </Row>
+          <hr/>
+          <Row>
+            <h3>
+              Current Vote &nbsp;
+              <ResetButton onClick={() => this.reset()}/>
+            </h3>
+            <VoteTable 
+              votes={[this.state.currentVote]}/>
+          </Row>
+          <Row>
+            <h3>Previous Votes</h3>
+            <VoteTable 
+              votes={this.state.previousVotes}
+              onClick={this.removeVote}/>
+          </Row>
+        </Container>
     );
   }
 }
+
+function VoteTable(props) {
+  const votes = props.votes || [];
+  const rows = votes.length > 0 ? votes.map((vote, i) =>
+    <tr key={i}>
+      <td>
+        {props.onClick && 
+          <Badge color="danger" onClick={() => props.onClick(vote)}>X</Badge>
+        }
+        </td>
+        <TableRow options={vote.options}></TableRow>
+    </tr>
+  )
+  : <div>No Live vote!</div>
+
+  return (
+    <Table hover>
+      {votes.length > 0 &&
+        <tbody>
+          {rows}
+        </tbody>
+      }
+    </Table>
+  );
+}
+
+function TableRow(props) {
+  const options = props.options || [];
+  return (
+    options.map((option) =>
+      <td key={option.text}>
+        {option.text} | {option.value }
+      </td>
+    )
+  );
+}
+
 
 function OptionList(props) {
   const options = props.options || [];
   const listItems = options.map((option) =>
     <ListGroupItem key={option.text}>
-      {option.text}
-      {!props.canBeDeleted &&
-        <Badge pill>{option.value }</Badge>
-      }
+      <div className="float-left">{option.text}</div>
+      &nbsp;
       {props.canBeDeleted &&
-        <Button onClick={props.onClick}>X</Button>
+        <Button className="float-right" onClick={() => props.onClick(option)}>X</Button>
       }
     </ListGroupItem>
   );
   return (
     <div>
       <ListGroup>{listItems}</ListGroup>
-
     </div>
   );
 }
@@ -99,9 +212,9 @@ function OptionList(props) {
 function ResetButton(props) {
   return(
     <Button 
-      color="danger"
+      color="link"
       onClick={props.onClick}>
-      Reset Scores
+      Reset current scores
     </Button>
     );
 }
@@ -110,9 +223,9 @@ function SumbitButton(props) {
   return(
     <Button 
       color="primary"
-      disabled
+      disabled ={props.disabled}
       onClick={props.onClick}>
-      Add Vote
+      Start Vote
     </Button>
     );
 }

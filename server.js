@@ -12,7 +12,8 @@ app.use(express.static(path.join(__dirname, 'build')));
 
 //db config
 var mongoDB = process.env.MONGODB;
-mongoose.connect(mongoDB, { useMongoClient: true })
+mongoose.connect(mongoDB, { useMongoClient: true });
+mongoose.Promise = global.Promise;
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
@@ -32,37 +33,45 @@ app.use(function(req, res, next) {
 app.get('/', function (req, res) {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
- 
-app.get('/ping', function (req, res) {
-  return res.send('pong');
+
+app.delete('/votes/:id', function(req, res) {
+  Vote.findByIdAndRemove(req.params.id, function(err, vote) {
+    if(err) {
+      res.send(err);
+    } else {
+      let response = {
+        message: "Vote successfully deleted",
+        id: vote._id
+      };
+      res.status(200).send(response);
+    }
+  })
 });
 
-app.get('/votes', function(req, res) {
-  Vote.find(function(err, votes) {
+app.get('/votes/previous', function(req, res) {
+  Vote.find({votingLive: false}, function(err, votes) {
     if (err)
       res.send(err);
     res.json(votes);
   });
 });
 
-app.get('/latest', function(req, res) {
-  Vote.findOne({}, {}, { sort: { 'created_at' : -1 } }, function(err, vote) {
+app.get('/votes/current', function(req, res) {
+  Vote.findOne({votingLive: true}, {}, { sort: { 'created_at' : -1 } }, function(err, vote) {
     if (err) res.send(err);
     res.json(vote);
   });
 });
 
-app.post('/votes/newVote', function(req, res) {
+app.post('/vote/new', function(req, res) {
   var vote = new Vote({
-    id: mongoose.Types.ObjectId(),
-    title: req.body.title,
+    votingLive: true,
     options: req.body.options
   });
   vote.save(function(err,doc){
-    if(err) {
+    if(err)
       res.send(err);
-    res.json(vote);
-    }
+    else res.status(200).send(doc);
   });
 });
 
@@ -74,10 +83,23 @@ app.put('/vote/choose', function(req, res) {
     function(err, doc) {
       if(err)
         res.send(err);
-      res.send(doc);
+      else res.status(200).send(doc);
     }
   );
 })
+
+app.put("/vote/end", function(req, res) {
+  Vote.findById(req.body.id, function(err, vote) {
+    if(err) res.send(err);
+    else {
+      vote.votingLive = false;
+      vote.save(err => {
+        if(err) console.log("ERR");
+        else res.status(200).send(vote);
+      });
+    }
+  });
+});
 
 app.put("/vote/reset", function(req, res) {
   Vote.findById(req.body.id, function(err, vote) {
@@ -85,9 +107,8 @@ app.put("/vote/reset", function(req, res) {
       res.send(err);
     vote.options.forEach(option => option.value = 0);
     vote.save(err => {
-      if(err) 
-        console.log("ERR");
-      res.status(200).send(vote);
+      if(err) console.log("ERR");
+      else res.status(200).send(vote);
     });
   });
 });

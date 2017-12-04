@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var VotesSchema = new Schema({
-  title: String,
+  votingLive: Boolean,
   options: [{
     text: String,
     value: Number
