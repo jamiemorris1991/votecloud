@@ -32,19 +32,19 @@ class App extends Component {
           <h1 className="App-title">We are London!</h1>
         </header>
           <div>
-          <Navbar color="faded" light>
+          {/* <Navbar color="faded" light>
             <NavbarBrand href="/" className="mr-auto">Vote Cloud</NavbarBrand>
             <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
               <Collapse isOpen={!this.state.collapsed} navbar>
               <Nav navbar>
-                <NavItem><Link to="/">Cloud </Link></NavItem>
                 <NavItem><Link to="/vote">Vote Now!</Link></NavItem>
+                <NavItem><Link to="/cloud">Cloud </Link></NavItem>
                 <NavItem><Link to="/Admin">Admin</Link></NavItem>
               </Nav>
              </Collapse>
-           </Navbar>
-            <hr />
-            <Route exact path="/" component={Cloud} />
+           </Navbar> */}
+            <Route exact path="/" component={Voter} />
+            <Route path="/cloud" component={Cloud} />
             <Route path="/vote" component={Voter} />
             <Route path="/admin" component={Admin} />
           </div>

@@ -16,7 +16,7 @@ export default class Voter extends Component {
   }
 
   componentDidMount() {
-    axios.get(`/latest`)
+    axios.get(`/votes/current`)
       .then(res => {
         this.setState({ vote: res.data });
       })
@@ -31,17 +31,6 @@ export default class Voter extends Component {
       .then(res => {
         console.log(res.status);
       })
-
-    //TODO Remove this block
-    let newOptions = this.state.vote.options;
-    const index = this.state.vote.options.findIndex(option => choice.text === option.text);
-    newOptions[index].value++;
-    this.setState({
-      blocked: true,
-      vote: {
-        options: newOptions
-      }
-    });
   }
 
   renderOption(option) {
@@ -78,6 +67,8 @@ export default class Voter extends Component {
 function Option(props) {
   return (
     <Button
+      className="btn-block"
+      color="info"
       style={props.size}
       onClick={props.onClick}>
       {props.text}
