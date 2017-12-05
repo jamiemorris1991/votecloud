@@ -35,50 +35,60 @@ class WordCloud extends Component {
   }
 
   componentWillMount() {
-    this.wordCloud = ReactFauxDom.createElement('div');
+    const { width, height } = this.props;
+
+    this.wordCloudElement = ReactFauxDom.createElement('div');
+
+    this.wordCloud =  select(this.wordCloudElement)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${width / 2},${height / 2})`);
   }
 
   render() {
     const { data, width, height, padding, fontSizeMapper, fontWeightMapper, rotate } = this.props;
-    const wordCounts = data.map(
-      text => ({ ...text })
-    );
+    const words = data.slice(0);
 
-    // clear old words
-    select(this.wordCloud).selectAll('*').remove();
-
-    // render based on new data
-    const layout = cloud()
+    cloud()
       .size([width, height])
-      .words(wordCounts)
+      .words(words)
       .padding(padding)
       .rotate(rotate)
       .fontSize(fontSizeMapper)
       .fontWeight(fontWeightMapper)
       .on('end', words => {
-        select(this.wordCloud)
-          .append('svg')
-          .attr('width', layout.size()[0])
-          .attr('height', layout.size()[1])
-          .append('g')
-          .attr('transform', `translate(${layout.size()[0] / 2},${layout.size()[1] / 2})`)
+        const wordCloud = this.wordCloud
           .selectAll('text')
-          .data(words)
+          .data(words, word => word._id);
+
+        wordCloud
           .enter()
           .append('text')
-          .style('font-size', d => `${d.size}px`)
-          .style('font-weight', d => d.weight)
           .attr('class', 'word')
           .attr('text-anchor', 'middle')
+          .style('font-weight', d => d.weight)
+          .style('font-size', d => `${d.size}px`)
           .attr('transform',
-            d => `translate(${[d.x, d.y]})rotate(${d.rotate})`
+            d => `translate(${d.x}, ${d.y})rotate(${d.rotate})`
           )
           .text(d => d.text);
-      });
 
-    layout.start();
+        wordCloud
+          .style('font-weight', d => d.weight)
+          .style('font-size', d => `${d.size}px`)
+          .attr('transform',
+            d => `translate(${d.x}, ${d.y})rotate(${d.rotate})`
+          );
 
-    return this.wordCloud.toReact();
+          wordCloud
+            .exit()
+            .remove();
+      })
+      .start();
+
+    return this.wordCloudElement.toReact();
   }
 }
 

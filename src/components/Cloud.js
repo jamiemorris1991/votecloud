@@ -6,7 +6,7 @@ export default class Cloud extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      latestVote: {
+      vote: {
         title: "No Votes yet!",
         options: []
       }
@@ -18,9 +18,22 @@ export default class Cloud extends Component {
   }
 
   componentDidMount() {
+    this.getVotes();
+    this.interval = setInterval(() => {
+      this.getVotes();
+    }, 30000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  getVotes() {
     axios.get(`/votes/current`)
-    .then(res => {
-      this.setState({latestVote: res.data});
+    .then(({ data }) => {
+      if (data) {
+        this.setState({ vote: data });
+      }
     })
   }
 
@@ -30,9 +43,9 @@ export default class Cloud extends Component {
         <WordCloud
           width="1000"
           height="800"
-          data={this.state.latestVote.options}
-          fontSizeMapper={word => 20 + (Math.pow(word.value, 2) * 4)}
-          rotate={() => (Math.floor(Math.random() * (181) + 90) + 180) % 360}
+          data={this.state.vote.options}
+          rotate={() => Math.round(Math.random() * 4) * 90}
+          fontSizeMapper={word => 20 + (Math.exp(word.value / 5) * 20)}
           fontWeightMapper={word => Math.min(300 + (word.value * 100), 1000)}
         />
       </div>
