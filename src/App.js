@@ -3,7 +3,7 @@ import {Route, NavLink as RRNavLink } from 'react-router-dom';
 import { Navbar, Nav, NavItem, NavLink, Container } from 'reactstrap';
 import Responsive from 'react-responsive';
 
-import logo from './download.png';
+import logo from './logo.svg';
 import './App.css';
 
 import Voter from './components/Voter';
@@ -30,9 +30,8 @@ class App extends Component {
     return (
       <div className="App">
         <header className="App-header">
-          <h1 className="App-title">Vote Cloud</h1>
           <img src={logo} alt="logo" />
-          
+
         </header>
         <Desktop>
           <Container>

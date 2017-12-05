@@ -2,10 +2,8 @@ import { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactFauxDom from 'react-faux-dom';
 import { select } from 'd3-selection';
-import { scaleOrdinal } from 'd3-scale';
 import cloud from 'd3-cloud';
-
-const fill = scaleOrdinal(["#3bb2bb"]);
+import '../styles/wordCloud.css';
 
 class WordCloud extends Component {
   static propTypes = {
@@ -19,11 +17,8 @@ class WordCloud extends Component {
       PropTypes.number,
       PropTypes.func,
     ]),
-    font: PropTypes.oneOfType([
-      PropTypes.string,
-      PropTypes.func,
-    ]),
     fontSizeMapper: PropTypes.func,
+    fontWeightMapper: PropTypes.func,
     rotate: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.func,
@@ -34,8 +29,8 @@ class WordCloud extends Component {
     width: 700,
     height: 600,
     padding: 5,
-    font: 'serif',
     fontSizeMapper: word => word.value,
+    fontWeightMapper: word => 300,
     rotate: 0,
   }
 
@@ -44,7 +39,7 @@ class WordCloud extends Component {
   }
 
   render() {
-    const { data, width, height, padding, font, fontSizeMapper, rotate } = this.props;
+    const { data, width, height, padding, fontSizeMapper, fontWeightMapper, rotate } = this.props;
     const wordCounts = data.map(
       text => ({ ...text })
     );
@@ -55,11 +50,11 @@ class WordCloud extends Component {
     // render based on new data
     const layout = cloud()
       .size([width, height])
-      .font(font)
       .words(wordCounts)
       .padding(padding)
       .rotate(rotate)
       .fontSize(fontSizeMapper)
+      .fontWeight(fontWeightMapper)
       .on('end', words => {
         select(this.wordCloud)
           .append('svg')
@@ -72,8 +67,8 @@ class WordCloud extends Component {
           .enter()
           .append('text')
           .style('font-size', d => `${d.size}px`)
-          .style('font-family', font)
-          .style('fill', (d, i) => fill(i))
+          .style('font-weight', d => d.weight)
+          .attr('class', 'word')
           .attr('text-anchor', 'middle')
           .attr('transform',
             d => `translate(${[d.x, d.y]})rotate(${d.rotate})`
