@@ -9,29 +9,62 @@ import './App.css';
 import Voter from './components/Voter';
 import Cloud from './components/Cloud';
 import Admin from './components/Admin';
+import GoogleAuth from './components/GoogleAuth';
 
 const Desktop = ({ children }) => <Responsive minWidth={992} children={children} />;
 class App extends Component {
   constructor(props) {
     super(props);
-    this.toggleNavbar = this.toggleNavbar.bind(this);
+    this.onSignIn = this.onSignIn.bind(this);
+    this.signOut = this.signOut.bind(this);
     this.state = {
-      collapsed: true
+      loggedIn: false,
+      user: {}
     };
   }
 
-  toggleNavbar() {
+  componentDidMount () {
+    window.gapi.signin2.render('g-signin2', {
+      'scope': 'https://www.googleapis.com/auth/plus.login',
+      'width': 150,
+      'height': 40,
+      'longtitle': false,
+      'theme': 'light',
+      'onsuccess': this.onSignIn
+    });  
+  }
+
+  onSignIn(googleUser) {
+    console.log("Foo");
+    let profile = googleUser.getBasicProfile();
+    sessionStorage.setItem('authToken', profile.getId());
+    sessionStorage.setItem('name', profile.getName());
+    sessionStorage.setItem('imageUrl', profile.getImageUrl());
+    sessionStorage.setItem('email', profile.getEmail());
+    
     this.setState({
-      collapsed: !this.state.collapsed
+      user: {
+        name: profile.getName(),
+        email: profile.getEmail
+      }
     });
   }
+
+  signOut() {
+    const auth2 = window.gapi.auth2.getAuthInstance();
+    auth2.signOut().then(() => {
+      console.log('User signed out.');
+      sessionStorage.clear();
+      this.setState({user: {}});
+    }); 
+  }
+
 
   render() {
     return (
       <div className="App">
         <header className="App-header">
           <img src={logo} alt="logo" />
-
         </header>
         <Desktop>
           <Container>
@@ -45,10 +78,11 @@ class App extends Component {
               <hr/>
             </Container>
           </Desktop>
-            <Route exact path="/" component={Voter} />
-            <Route path="/cloud" component={Cloud} />
-            <Route path="/vote" component={Voter} />
-            <Route path="/admin" component={Admin} />
+          <GoogleAuth/>
+          <Route exact path="/" component={Voter} />
+          <Route path="/cloud" component={Cloud} />
+          <Route path="/vote" component={Voter} />
+          <Route path="/admin" component={Admin} />
       </div>
     );
   }
